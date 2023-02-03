@@ -1,7 +1,10 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
-const userService = require('./auth.service');
+const authService = require('./auth.service');
 
 jest.mock('../models/user.model');
+jest.mock('bcrypt');
 
 describe('register', () => {
     test('should create new user given first name, last name, email and password and user does not exists', async () => {
@@ -21,7 +24,7 @@ describe('register', () => {
             lastName: newUserData.lastName
         });
 
-        const result = await userService.register(newUserData);
+        const result = await authService.register(newUserData);
 
         expect(result).not.toBeNull();
         expect(result.success).toBeTruthy();
@@ -48,10 +51,80 @@ describe('register', () => {
             lastName: 'Doe'
         });
 
-        const result = await userService.register(newUserData);
+        const result = await authService.register(newUserData);
 
         expect(result).not.toBeNull();
         expect(result.success).toBeFalsy();
         expect(result.message).toBe("User already exists.");
+    });
+});
+
+describe('login', () => {
+    test('should return JWT token for a valid user', async () => {
+        const testCredentials = {
+            email: 'test@test.org',
+            password: 'some password $$1'
+        };
+
+        User.findOne.mockResolvedValue({
+            id: 1,
+            firstName: 'Joe',
+            lastName: 'Doe',
+            email: 'test@test.org',
+            password: 'isdfkjshfddksfj'
+        });
+        bcrypt.compare.mockResolvedValue(true);
+
+        const userData = { id: 1, email: testCredentials.email, firstName: 'Joe', lastName: 'Doe' };
+        const expectedToken = jwt.sign(userData, process.env.JWT_SECRET, {
+            expiresIn: "10m",
+            algorithm: "HS512"
+        });
+
+        const result = await authService.login(testCredentials);
+
+        expect(result).not.toBeNull();
+        expect(result.success).toBeTruthy();
+        expect(result.message).toBe("");
+        expect(result.data?.token).toBe(expectedToken);
+
+        expect(User.findOne).toBeCalled();
+    });
+
+    test('should return not success for non-existing user', async () => {
+        const testCredentials = {
+            email: 'test@test.org',
+            password: 'some password $$1'
+        };
+
+        User.findOne.mockResolvedValue(null);
+
+        const result = await authService.login(testCredentials);
+
+        expect(result).not.toBeNull();
+        expect(result.success).toBeFalsy();
+        expect(result.message).toBe("Invalid credentials");
+    });
+
+    test('should return not success for invalid password', async () => {
+        const testCredentials = {
+            email: 'test@test.org',
+            password: 'some password $$1'
+        };
+
+        User.findOne.mockResolvedValue({
+            id: 1,
+            firstName: 'Joe',
+            lastName: 'Doe',
+            email: 'test@test.org',
+            password: 'isdfkjshfddksfj'
+        });
+        bcrypt.compare.mockResolvedValue(false);
+
+        const result = await authService.login(testCredentials);
+
+        expect(result).not.toBeNull();
+        expect(result.success).toBeFalsy();
+        expect(result.message).toBe("Invalid credentials");
     });
 });
