@@ -6,10 +6,15 @@ dotenv.config();
 const express = require('express');
 const app = express();
 const initModels = require('./models/init.models');
+const authRoutes = require('./routes/auth.routes');
 
 initModels(); 
 
+app.use(express.json());
+
 app.get('/', (req, res) => res.status(200).json({ message: 'Welcome!'}));
+
+app.use('/api/v1/auth', authRoutes);
 
 const PORT = process.env.PORT;
 
