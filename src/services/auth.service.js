@@ -4,6 +4,7 @@ dotenv.config();
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mailer = require('../utils/mailer');
 
 /**
  * User data
@@ -47,6 +48,13 @@ const register = async (userData) => {
 
         existingUser = await User.create(userData);
 
+        mailer.sendMail({
+            from: 'admin@test.org',
+            to: existingUser.email,
+            subject: 'Account created',
+            body: 'Your account has been created'
+        });
+        
         return {
             success: true,
             message: "",
