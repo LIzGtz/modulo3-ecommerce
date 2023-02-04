@@ -2,9 +2,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
 const authService = require('./auth.service');
+const mailer = require('../utils/mailer');
 
 jest.mock('../models/user.model');
 jest.mock('bcrypt');
+jest.mock('../utils/mailer');
 
 describe('register', () => {
     test('should create new user given first name, last name, email and password and user does not exists', async () => {
@@ -57,6 +59,31 @@ describe('register', () => {
         expect(result.success).toBeFalsy();
         expect(result.message).toBe("User already exists.");
     });
+
+    test.skip('should send account registration email notification', async () => {
+        const newUserData = {
+            email: 'test@test.org',
+            firstName: 'Test',
+            lastName: 'User',
+            password: '123'
+        };
+
+        User.findOne.mockResolvedValue(null);
+        User.create.mockResolvedValue({
+            id: 1,
+            email: newUserData.email,
+            firstName: newUserData.firstName,
+            lastName: newUserData.lastName
+        });
+
+        // jest.fn()
+
+        mailer.sendMail.mockResolvedValue({});
+
+        const result = await authService.register(newUserData);
+
+
+    })
 });
 
 describe('login', () => {

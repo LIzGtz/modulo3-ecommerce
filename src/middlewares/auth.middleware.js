@@ -12,8 +12,7 @@ const authorize = (req, res, next) => {
             res.status(401).json({ message: 'Invalid or expired token' });
             return;
         }
-
-        console.log(decoded);
+        
         next();
     });
 };

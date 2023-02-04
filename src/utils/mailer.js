@@ -28,7 +28,11 @@ const transporter = nodemailer.createTransport({
  * @returns {Promise<Result>} The operation result with the JWT token if successful
  */
 const sendMail = async (message) => {
-    await transporter.sendMail(message);
+    try {
+        await transporter.sendMail(message);
+    } catch (err) {
+        console.error('Error while sending email: ', err);
+    }
 }
 
 module.exports = {
