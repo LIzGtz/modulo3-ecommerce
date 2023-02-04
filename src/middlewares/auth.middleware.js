@@ -3,8 +3,8 @@ require('dotenv').config();
 
 /** @type { import("express").RequestHandler} */
 const authorize = (req, res, next) => {
-    let { authorization: token } = req.headers;
-    token = token.replace('Bearer', "").trimStart();
+    const authHeader = req.get('Authorization') || "bearer xx";
+    const token = authHeader.replace('Bearer', "").trimStart();
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
