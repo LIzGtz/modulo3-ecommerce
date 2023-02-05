@@ -2,12 +2,11 @@ const authService = require('../services/auth.service');
 
 /** @type { import("express").RequestHandler} */
 const registerUser = async (req, res) => {
-    const { email, firstName, lastName, password } = req.body;
+    const { email, userName, password } = req.body;
 
     const result = await authService.register({
         email,
-        firstName,
-        lastName,
+        userName,
         password
     });
 

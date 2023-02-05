@@ -10,8 +10,7 @@ const mailer = require('../utils/mailer');
  * User data
  * @typedef {Object} NewUserData
  * @property {string} email - User Email
- * @property {string} firstName - User first name
- * @property {string} lastName - User last name
+ * @property {string} userName - User name
  * @property {string} password - User password
  */
 
@@ -31,8 +30,7 @@ const mailer = require('../utils/mailer');
 const register = async (userData) => {
     /* let userInfo = {
         email: 'test@example.org',
-        firstName: 'Panchito',
-        lastName: 'Gonzalez',
+        userName: 'test',
         password: '123'
     } */
     // createUser(userInfo)
@@ -54,14 +52,13 @@ const register = async (userData) => {
             subject: 'Account created',
             body: 'Your account has been created'
         });
-        
+
         return {
             success: true,
             message: "",
             data: {
                 id: existingUser.id,
-                firstName: existingUser.firstName,
-                lastName: existingUser.lastName,
+                userName: existingUser.userName,
                 email: existingUser.email
             }
         };

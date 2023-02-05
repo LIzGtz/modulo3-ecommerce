@@ -12,11 +12,7 @@ const User = db.define('User', {
         allowNull: false,
         unique: true
     },
-    firstName: {
-        type: DataTypes.TEXT,
-        allowNull: false
-    },
-    lastName: {
+    userName: {
         type: DataTypes.TEXT,
         allowNull: false
     },

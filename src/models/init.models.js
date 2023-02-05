@@ -5,7 +5,7 @@ const User = require("./user.model")
 const initModels = async () => {
     // Define relationships here
     
-    await db.sync();
+    await db.sync({ force: true });
 
     let adminUser = await User.findOne({
         where: {
@@ -17,8 +17,7 @@ const initModels = async () => {
         const passwordHash = await hash(process.env.ADMIN_PASSWORD, 3);
         adminUser = await User.create({
             email: 'admin@example.org',
-            firstName: 'Admin',
-            lastName: 'User',
+            userName: 'admin',
             password: passwordHash
         });
     }
