@@ -103,8 +103,7 @@ const login = async (userCredentials) => {
     const userData = {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName
+        userName: user.userName
     };
     const userToken = jwt.sign(userData, process.env.JWT_SECRET, {
         expiresIn: "10m",
