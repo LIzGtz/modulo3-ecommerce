@@ -1,11 +1,16 @@
 const { hash } = require("bcrypt");
-const { db } = require("../utils/database")
+const { db } = require("../utils/database");
+const Product = require("./product.model");
 const User = require("./user.model")
 
 const initModels = async () => {
     // Define relationships here
+    User.hasMany(Product, {
+        foreignKey: 'userId'
+    });
+    Product.hasOne(User);
     
-    await db.sync({ force: true });
+    await db.sync({ force: false });
 
     let adminUser = await User.findOne({
         where: {

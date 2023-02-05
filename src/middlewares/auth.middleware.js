@@ -12,6 +12,11 @@ const authorize = (req, res, next) => {
             res.status(401).json({ message: 'Invalid or expired token' });
             return;
         }
+
+        req.user = {
+            id: decoded.id,
+            email: decoded.email
+        };
         
         next();
     });
