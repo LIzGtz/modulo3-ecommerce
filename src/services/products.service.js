@@ -3,6 +3,7 @@ dotenv.config();
 
 const User = require('../models/user.model');
 const Product = require('../models/product.model');
+const { Op } = require('sequelize');
 
 /**
  * Product data
@@ -46,6 +47,34 @@ const create = async (productData) => {
     };
 };
 
+const getProductsInExistence = async () => {
+    let productsInExistence = await Product.findAll({
+        where: {
+            availableQty: {
+                [Op.gt]: 0
+            }
+        },
+        include: User
+    });
+
+    const returnValue = productsInExistence.map(p => {
+        return {
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            availableQty: p.availableQty,
+            imageUrl: p.imageUrl,
+            userName: p.User.userName
+        }
+    });
+    return {
+        success: true,
+        message: '',
+        data: returnValue
+    };
+};
+
 module.exports = {
-    create
+    create,
+    getProductsInExistence
 };

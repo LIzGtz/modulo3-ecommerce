@@ -21,6 +21,19 @@ const createProduct = async (req, res) => {
     res.status(400).json({ message: result.message });
 };
 
+/** @type { import("express").RequestHandler} */
+const getProductsInExistence = async (req, res) => {
+    const result = await productsService.getProductsInExistence();
+
+    if (result.success) {
+        res.status(200).json(result.data);
+        return;
+    }
+
+    res.status(400).json({ message: result.message });
+}
+
 module.exports = {
-    createProduct
+    createProduct,
+    getProductsInExistence
 };

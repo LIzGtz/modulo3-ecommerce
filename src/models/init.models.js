@@ -8,7 +8,9 @@ const initModels = async () => {
     User.hasMany(Product, {
         foreignKey: 'userId'
     });
-    Product.hasOne(User);
+    Product.belongsTo(User, {
+        foreignKey: 'userId'
+    });
     
     await db.sync({ force: false });
 
