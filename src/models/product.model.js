@@ -1,7 +1,8 @@
 const { DataTypes } = require('sequelize');
 const { db } = require('./../utils/database');
+const User = require('./user.model');
 
-const Product = db.define('Product', {
+const Product = db.define('product', {
     id: {
         primaryKey: true,
         type: DataTypes.INTEGER,
@@ -22,7 +23,7 @@ const Product = db.define('Product', {
     imageUrl: {
         type: DataTypes.TEXT,
         allowNull: true
-    }
+    },
 }, {
     tableName: 'Products'
 });

@@ -1,16 +1,39 @@
 const { hash } = require("bcrypt");
 const { db } = require("../utils/database");
+const { Cart, CartItem } = require("./cart.model");
 const Product = require("./product.model");
 const User = require("./user.model")
 
 const initModels = async () => {
     // Define relationships here
     User.hasMany(Product, {
-        foreignKey: 'userId'
+        foreignKey: {
+            allowNull: false
+        }
     });
-    Product.belongsTo(User, {
-        foreignKey: 'userId'
+    Product.belongsTo(User);
+
+    User.hasOne(Cart, {
+        foreignKey: {
+            allowNull: false,
+            unique: true
+        }
     });
+    Cart.belongsTo(User);
+
+    Cart.hasMany(CartItem, {
+        foreignKey: {
+            allowNull: false
+        }
+    });
+    CartItem.belongsTo(Cart);
+
+    Product.hasMany(CartItem, {
+        foreignKey: {
+            allowNull: false
+        }
+    });
+    CartItem.belongsTo(Product);
     
     await db.sync({ force: false });
 
