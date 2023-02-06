@@ -23,6 +23,19 @@ const CartItem = db.define('cartItem', {
         type: DataTypes.INTEGER,
         autoIncrement: true
     },
+    quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    price: {
+        type: DataTypes.DECIMAL,
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        defaultValue: 'in-cart'
+    }
 }, {
     tableName: 'CartItems'
 });

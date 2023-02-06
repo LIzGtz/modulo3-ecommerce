@@ -6,6 +6,7 @@ const User = require("../models/user.model");
  * Product data
  * @typedef {Object} NewCartItem
  * @property {int} productId - Product id
+ * @property {int} quantity - Quantity
  * @property {int} userId - User
  */
 
@@ -41,7 +42,7 @@ const addProductToCart = async (cartItemData) => {
         };
     }
 
-    if (product.availableQty <= 0) {
+    if ((product.availableQty - cartItemData.quantity) < 0) {
         return {
             success: false,
             message: `Product '${cartItemData.productId}' is not available.` 
@@ -52,26 +53,20 @@ const addProductToCart = async (cartItemData) => {
     if (cart == null) {
         cart = await user.createCart({ totalAmount: 0 });
     }
-    console.log('cart = ', cart);
+
     const cartItem = await CartItem.create({
         cartId: cart.id,
-        productId: product.id
+        productId: product.id,
+        price: product.price,
+        quantity: cartItemData.quantity
     });
 
     cart.totalAmount += product.price;
     await cart.save();
-    // await cartItem.save();
-    // await cart.addCartItem(cartItem);
-    // await cart.save();
-    // await CartItem.create({
-    //     cartId: cart.id,
-    //     productId: product.id
-    // });
-    // const cart = Cart.findOrBuild({
-    //     where: {
-    //         userId: cartItemData.userId
-    //     }
-    // })
+    
+    product.availableQty -= cartItemData.quantity;
+    await product.save();
+
     return {
         success: true,
         message: '',
@@ -79,6 +74,44 @@ const addProductToCart = async (cartItemData) => {
     };
 };
 
+/**
+ * Adds a product to user's cart
+ * @param {int} userId 
+ * @returns {Promise<Result>} The operation result
+ */ 
+const getCartItems = async (userId) => {
+    const cartItems = await CartItem.findAll({
+        where: {
+            cartId: userId
+        },
+        include: Product
+    });
+
+    if (cartItems == null) {
+        return {
+            success: false,
+            message: 'Cart not found.'
+        };
+    }
+
+    const carts = cartItems.map(item => {
+        return {
+            cartId: item.cartId,
+            productId: item.product.id,
+            productName: item.product.name,
+            price: item.product.price,
+            imageUrl: item.product.imageUrl
+        }
+    });
+
+    return {
+        success: true,
+        message: "",
+        data: carts
+    };
+};
+
 module.exports = {
-    addProductToCart
+    addProductToCart,
+    getCartItems
 }
