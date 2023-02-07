@@ -1,8 +1,10 @@
 const { hash } = require("bcrypt");
 const { db } = require("../utils/database");
 const { Cart, CartItem } = require("./cart.model");
+const { Order, OrderItem } = require("./order.model");
 const Product = require("./product.model");
 const User = require("./user.model")
+const AuthService = require('../services/auth.service');
 
 const initModels = async () => {
     // Define relationships here
@@ -34,23 +36,34 @@ const initModels = async () => {
         }
     });
     CartItem.belongsTo(Product);
+
+    User.hasMany(Order, {
+        foreignKey: {
+            allowNull: false
+        }
+    });
+    Order.belongsTo(User);
+
+    Order.hasMany(OrderItem, {
+        foreignKey: {
+            allowNull: false
+        }
+    });
+    OrderItem.belongsTo(Order);
+
+    OrderItem.belongsTo(Product, {
+        foreignKey: {
+            allowNull: false
+        }
+    });
     
     await db.sync({ force: false });
 
-    let adminUser = await User.findOne({
-        where: {
-            email: 'admin@example.org'
-        }
+    AuthService.register({
+        email: 'admin@example.org',
+        password: process.env.ADMIN_PASSWORD,
+        userName: 'admin'
     });
-
-    if (adminUser == null) {
-        const passwordHash = await hash(process.env.ADMIN_PASSWORD, 3);
-        adminUser = await User.create({
-            email: 'admin@example.org',
-            userName: 'admin',
-            password: passwordHash
-        });
-    }
 };
 
 module.exports = initModels;
