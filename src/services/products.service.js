@@ -64,7 +64,7 @@ const getProductsInExistence = async () => {
             price: p.price,
             availableQty: p.availableQty,
             imageUrl: p.imageUrl,
-            userName: p.User.userName
+            userName: p.user.userName
         }
     });
     return {
